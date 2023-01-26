@@ -1,11 +1,10 @@
-import pg from "pg";
-import dotenv from "dotenv";
-dotenv.config();
+import { PrismaClient } from "@prisma/client";
 
-const { Pool } = pg;
-const configDatabase = {
-  connectionString: process.env.DATABASE_URL
-};
+export let prisma: PrismaClient;
+export function connectDb(): void {
+  prisma = new PrismaClient();
+}
 
-const db = new Pool(configDatabase);
-export default db;
+export async function disconnectDB(): Promise<void> {
+  await prisma?.$disconnect();
+}
