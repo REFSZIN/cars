@@ -1,42 +1,54 @@
-import { prisma } from "../config";
+import prisma from "../config/database.js";
+import { cars } from "@prisma/client";
+
+export type CarInput = Omit<cars, "id" | "createAt">;
 
 async function getCars() {
-  return prisma.cars.findMany();
+  // const data = await db.query(`SELECT * FROM cars`);
+  const data = await prisma.cars.findMany();
+  return data;
 }
 
-async function getCar(id: number) {
-  return prisma.cars.findFirst({
-    where: {
-      id: id,
-    }
-  });
+async function getCar(id: number): Promise<cars> {
+  // const data = await db.query(`SELECT * FROM cars WHERE id = $1`, [id]);
+  const data = await prisma.cars.findFirst({
+    where: { id }
+  })
+  return data;
 }
 
 async function getCarWithLicensePlate(licensePlate: string) {
-  return prisma.cars.findFirst({
-    where: {
-      licensePlate: licensePlate,
-    }
-  });
+  // const data = await db.query(`SELECT * FROM cars WHERE "licensePlate" = $1`, [licensePlate]);
+  const data = await prisma.cars.findFirst({
+    where: { licensePlate }
+  })
+  return data;
 }
 
-async function createCar(model: string, licensePlate: string, year: string, color: string) {
-  return prisma.cars.create({
-    data: {
-      year: year,
-      model: model,
-      licensePlate: licensePlate,
-      color: color
-    }
-  });
+async function createCar(car: CarInput) {
+  await prisma.cars.create({
+    data: car
+  })
+
+  // await db.query(
+  //   `INSERT INTO cars (model, "licensePlate", year, color)
+  //    VALUES ($1, $2, $3, $4)`,
+  //   [model, licensePlate, year, color]
+  // );
 }
 
 async function deleteCar(id: number) {
-  return prisma.cars.delete({
-    where: {
-      id: id,
-    }
-  });
+  await prisma.cars.delete({
+    where: { id }
+  })
+  // await db.query(`DELETE FROM cars WHERE id = $1`, [id]);
+}
+
+async function updateCar(id: number, car: CarInput) {
+  await prisma.cars.update({
+    where: { id },
+    data: car
+  })
 }
 
 const carRepository = {
@@ -44,7 +56,8 @@ const carRepository = {
   getCarWithLicensePlate,
   getCars,
   createCar,
-  deleteCar
+  deleteCar,
+  updateCar
 }
 
 export default carRepository;
