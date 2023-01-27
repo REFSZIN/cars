@@ -66,6 +66,7 @@ async function updateCar(req: Request, res: Response) {
     await carService.updateCar(parseInt(carId), car);
     res.sendStatus(httpStatus.OK);
   } catch (e) {
+    console.log(e);
     if (e.name === "NotFoundError") {
       return res.sendStatus(httpStatus.NOT_FOUND);
     }

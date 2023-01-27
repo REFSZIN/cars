@@ -14,4 +14,12 @@ model cars {
   year         Int
   color        String
   createAt     DateTime? @default(now()) @db.Timestamp(6)
+  category     category  @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+}
+
+model category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  cars cars[]
 }

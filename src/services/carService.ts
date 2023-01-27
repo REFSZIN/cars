@@ -22,7 +22,7 @@ async function createCar(car: CarInput) {
     throw conflictError(`Car with license plate ${car.licensePlate} already registered.`)
   }
 
-  await carRepository.createCar(car);
+  await carRepository.updateOrCreateCar(0, car);
 }
 
 async function deleteCar(id: number) {
@@ -32,7 +32,7 @@ async function deleteCar(id: number) {
 
 async function updateCar(id: number, car: CarInput) {
   await getCar(id);
-  await carRepository.updateCar(id, car);
+  await carRepository.updateOrCreateCar(id, car);
 }
 
 const carService = {

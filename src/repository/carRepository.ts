@@ -1,5 +1,5 @@
 import prisma from "../config/database.js";
-import { cars } from "@prisma/client";
+import { cars, category } from "@prisma/client";
 
 export type CarInput = Omit<cars, "id" | "createAt">;
 
@@ -9,11 +9,24 @@ async function getCars() {
   return data;
 }
 
-async function getCar(id: number): Promise<cars> {
+async function getCar(id: number) {
   // const data = await db.query(`SELECT * FROM cars WHERE id = $1`, [id]);
   const data = await prisma.cars.findFirst({
-    where: { id }
+    where: { id },
+    select: {
+      categoryId: true,
+      model: true,
+      color: true,
+      licensePlate: true,
+      year: true,
+      category: {
+        select: {
+          name: true
+        }
+      }
+    }
   })
+
   return data;
 }
 
@@ -23,6 +36,14 @@ async function getCarWithLicensePlate(licensePlate: string) {
     where: { licensePlate }
   })
   return data;
+}
+
+async function updateOrCreateCar(id: number, car: CarInput) {
+  await prisma.cars.upsert({
+    where: { id },
+    create: car,
+    update: { ...car }
+  })
 }
 
 async function createCar(car: CarInput) {
@@ -57,7 +78,8 @@ const carRepository = {
   getCars,
   createCar,
   deleteCar,
-  updateCar
+  updateCar,
+  updateOrCreateCar
 }
 
 export default carRepository;
